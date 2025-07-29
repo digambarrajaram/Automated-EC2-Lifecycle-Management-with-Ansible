@@ -6,8 +6,8 @@ app = Flask(__name__)
 
 EMAIL = ""
 API_TOKEN = ""
-PROJECT_KEY = "SCRUM"
-ISSUE_TYPE_ID = "10011"
+PROJECT_KEY = ""
+ISSUE_TYPE_ID = ""
 
 # Mapping of GitHub issue ID (as string) -> Jira issue key
 GITHUB_TO_JIRA = {}
@@ -78,7 +78,7 @@ def handle_github_webhook():
         if not jira_issue_key:
             return jsonify({"error": "Jira issue not found for GitHub issue"}), 404
 
-        url = f"https://digambarrajaram2.atlassian.net/rest/api/3/issue/{jira_issue_key}/comment"
+        url = f"https:///rest/api/3/issue/{jira_issue_key}/comment"
         auth = HTTPBasicAuth(EMAIL, API_TOKEN)
         headers = {
             "Accept": "application/json",
