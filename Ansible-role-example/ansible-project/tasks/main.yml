@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-project
+- name: Install Apache HTTPD
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+    update_cache: yes
+
+- name: Copy index.html to web root
+  ansible.builtin.copy:
+    src: files/index.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
