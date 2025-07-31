@@ -1,7 +1,7 @@
 # meta/main.yml
 ---
 galaxy_info:
-  role_name: galaxy_deployment_test   # must match your repo name (after the dot)
+  role_name: ansible-project   # must match your repo name (after the dot)
   author: digambarrajaram
   description: A role to deploy something via Ansible Galaxy
   license: MIT
