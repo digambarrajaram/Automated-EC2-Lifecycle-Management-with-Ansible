@@ -1,0 +1,65 @@
+---
+- name: Stop and Terminate EC2 Instances Dynamically
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    region: ap-south-1
+
+  tasks:
+    - name: Get all running or pending EC2 instances
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        region: "{{ region }}"
+      register: ec2_info
+
+    - name: Filter instance IDs to stop (in running or pending state)
+      set_fact:
+        instances_to_stop: >-
+          {{
+            ec2_info.instances
+            | selectattr('state.name', 'in', ['running', 'pending'])
+            | map(attribute='instance_id')
+            | list
+          }}
+
+    - name: Stop the EC2 instances
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        instance_ids: "{{ item }}"
+        region: "{{ region }}"
+        state: stopped
+        wait: yes
+      loop: "{{ instances_to_stop }}"
+      when: instances_to_stop | length > 0
+
+    - name: Refresh instance info after stopping
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        region: "{{ region }}"
+      register: ec2_info_after_stop
+
+    - name: Filter stopped instances to terminate
+      set_fact:
+        instances_to_terminate: >-
+          {{
+            ec2_info_after_stop.instances
+            | selectattr('state.name', 'equalto', 'stopped')
+            | map(attribute='instance_id')
+            | list
+          }}
+
+    - name: Terminate stopped EC2 instances
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        instance_ids: "{{ item }}"
+        region: "{{ region }}"
+        state: absent
+        wait: yes
+      loop: "{{ instances_to_terminate }}"
+      when: instances_to_terminate | length > 0

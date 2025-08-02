@@ -1,0 +1,41 @@
+---
+- name: Stop and Terminate EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    region: ap-south-1               # Update region accordingly
+    instance:
+      - { instance_id: "i-01cd736fece2199c5" }
+      - { instance_id: "i-04f014971a6c4831c" }
+      - { instance_id: "i-0c0a6d0ccb2343749" }
+  tasks:  
+    - name: Stop the EC2 instance
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ access_key }}"  # From vault as defined
+        aws_secret_key: "{{ secret_key }}"  # From vault as defined  
+        instance_ids: "{{ item.instance_id }}"
+        region: "{{ region }}"
+        state: stopped
+        wait: yes
+      loop: "{{ instance }}"
+      #loop:
+      #  - { instance_id: "i-01cd736fece2199c5" }
+      #  - { instance_id: "i-04f014971a6c4831c" }
+      #  - { instance_id: "i-0c0a6d0ccb2343749" }
+
+    - name: Terminate the EC2 instance
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ access_key }}"  # From vault as defined
+        aws_secret_key: "{{ secret_key }}"  # From vault as defined  
+        instance_ids: "{{ item.instance_id }}"
+        region: "{{ region }}"
+        state: absent
+        wait: yes
+      loop: "{{ instance }}"
+      #loop:
+      #  - { instance_id: "i-01cd736fece2199c5" }
+      #  - { instance_id: "i-04f014971a6c4831c" }
+      #  - { instance_id: "i-0c0a6d0ccb2343749" }
+

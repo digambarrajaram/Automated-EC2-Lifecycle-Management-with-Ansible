@@ -1,0 +1,39 @@
+---
+- name: Terminate only stopped EC2 Instances
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    region: ap-south-1
+    instance:
+
+  tasks:
+    - name: Get info about all instances
+      amazon.aws.ec2_instance_info:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        region: "{{ region }}"
+        instance_ids: "{{ instance | map(attribute='instance_id') | list }}"
+      register: ec2_info
+
+    - name: Set list of stopped instances
+      set_fact:
+        stopped_instances: >-
+          {{
+            ec2_info.instances |
+            selectattr('state.name', 'equalto', 'stopped') |
+            map(attribute='instance_id') |
+            list
+          }}
+
+    - name: Terminate only stopped instances
+      amazon.aws.ec2_instance:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        instance_ids: "{{ item }}"
+        region: "{{ region }}"
+        state: absent
+        wait: yes
+      loop: "{{ stopped_instances }}"
+      when: stopped_instances | length > 0

@@ -1,0 +1,31 @@
+---
+- name: create 2 ubuntu and 1 amazon instance
+  amazon.aws.ec2_instance:
+    name: "{{ item.name }}"
+    aws_access_key: "{{ access_key }}"  # From vault as defined
+    aws_secret_key: "{{ secret_key }}"  # From vault as defined  
+    region: ap-south-1
+    key_name: "manage-node-1"
+    instance_type: t2.micro
+    security_group: default
+    network_interfaces:
+      - assign_public_ip: true
+    image_id: "{{ item.image}}"
+    tags:
+      Environment: Testing
+
+  loop:
+    - { image: "ami-0d0ad8bb301edb745" , name: "manage-node-1" }
+    - { image: "ami-0f918f7e67a3323f0" , name: "manage-node-2" }
+    - { image: "ami-0f918f7e67a3323f0" , name: "manage-node-3" }
+
+
+
+#    image_id: "{{ item }}"
+#    tags:
+#      Environment: Testing
+
+# loop:
+#   - "ami-0d0ad8bb301edb745"
+#   - "ami-0f918f7e67a3323f0"
+#   - "ami-0f918f7e67a3323f0"
