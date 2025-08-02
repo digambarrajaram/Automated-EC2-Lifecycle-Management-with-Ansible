@@ -1,0 +1,33 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Update apt packages
+      ansible.builtin.shell: apt update -y
+
+    - name: Install open ssl and open ssh
+      ansible.builtin.apt:
+        name: "{{ item.package }}"
+        state: latest
+      loop:
+        - { package: "openssh" }
+        - { package: "openssh-client" }
+        - { package: "openssh-server" }
+      ignore_errors: yes
+ 
+    - name: Verify docker version
+      ansible.builtin.shell: docker --version
+      register: output
+      ignore_errors: yes
+
+    - name: printing result of docker --version command
+      ansible.builtin.debug:
+        var: output
+   
+    - name: Installing docker if it is not available
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+      register: package
+      when: output.failed
