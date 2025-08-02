@@ -15,8 +15,8 @@
       Environment: Testing
 
   loop:
-    - { image: "ami-0d0ad8bb301edb745" , name: "manage-node-1" }
-    - { image: "ami-0f918f7e67a3323f0" , name: "manage-node-2" }
+    #- { image: "ami-0d0ad8bb301edb745" , name: "manage-node-1" }
+    #- { image: "ami-0f918f7e67a3323f0" , name: "manage-node-2" }
     - { image: "ami-0f918f7e67a3323f0" , name: "manage-node-3" }
 
 

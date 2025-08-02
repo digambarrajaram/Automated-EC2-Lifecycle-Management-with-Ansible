@@ -1,0 +1,24 @@
+- name: Get EC2 public IPs only
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    region: ap-south-1
+
+  tasks:
+    - name: Get EC2 instance information
+      amazon.aws.ec2_instance_info:
+        region: "{{ region }}"
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+      register: ec2_info
+
+    - name: Extract only public IPs
+      set_fact:
+        public_ips: "{{ ec2_info.instances | selectattr('public_ip_address', 'defined') | map(attribute='public_ip_address') | list }}"
+
+    - name: Print public IPs only
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ public_ips }}"

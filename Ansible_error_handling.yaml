@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Install open ssl and open ssh
+      ansible.builtin.apt:
+        name: "{{ item.package }}"
+        state: latest
+      loop:
+        - { package: "openssl" }
+        - { package: "openssh-client" }
+        - { package: "openssh-server" }
